@@ -89,10 +89,10 @@
       let third = "";
       let forth = "";
       let run = false;
-      let firstAlphabetIndex = 0; // Start with the first alphabet 'A'
-      let secAlphabetIndex = 0; // Start with the first alphabet 'A'
-      let thirdAlphabetIndex = 0; // Start with the first alphabet 'A'
-      let currentNumber = 0; // Start with the number 0
+      let firstAlphabetIndex = first !== "" ? capital.indexOf(first) : 0; // Start with the first alphabet 'A'
+      let secAlphabetIndex = sec !== "" ? numbers.indexOf(sec) : 0; // Start with the first alphabet 'A'
+      let thirdAlphabetIndex = third !== "" ? alphabet.indexOf(third) : 0; // Start with the first alphabet 'A'
+      let currentNumber = forth !== "" ? alphabet.indexOf(forth) : 0; // Start with the number 0
 
       function fetchData(e) {
         fetch(`http://127.0.0.1:3000/result?uid=${e}`)
@@ -147,7 +147,7 @@
           first !== "" ? first : capital.charAt(firstAlphabetIndex);
         const secondChar = sec !== "" ? sec : numbers.charAt(currentNumber);
         const thirdChar =
-          third !== "" ? third : capital.charAt(secAlphabetIndex);
+          third !== "" ? third : alphabet.charAt(secAlphabetIndex);
         const fourthChar =
           forth !== "" ? forth : alphabet.charAt(thirdAlphabetIndex);
 
@@ -155,30 +155,16 @@
         const sequentialId = `${firstChar}${secondChar}${thirdChar}${fourthChar}`;
 
         // Update indices for the next ID
-        if (forth === "") {
-          thirdAlphabetIndex++;
-        }
-        if (forth !== "" || thirdAlphabetIndex >= alphabet.length) {
-          if (third === "") {
-            secAlphabetIndex++;
-          }
-          if (thirdAlphabetIndex >= alphabet.length) {
-            thirdAlphabetIndex = 0;
-          }
-          if (third !== "" || secAlphabetIndex >= capital.length) {
-            if (secAlphabetIndex >= capital.length) {
-              secAlphabetIndex = 0;
-            }
-            if (sec === "") {
-              currentNumber++;
-            }
-            if (sec !== "" || currentNumber >= numbers.length) {
-              if (currentNumber >= numbers.length) {
-                currentNumber = 0;
-              }
-              if (first === "") {
-                firstAlphabetIndex++;
-              }
+        thirdAlphabetIndex++;
+        if (thirdAlphabetIndex >= alphabet.length) {
+          secAlphabetIndex++;
+          thirdAlphabetIndex = 0;
+          if (secAlphabetIndex >= alphabet.length) {
+            secAlphabetIndex = 0;
+            currentNumber++;
+            if (currentNumber >= numbers.length) {
+              currentNumber = 0;
+              firstAlphabetIndex++;
               if (firstAlphabetIndex >= capital.length) {
                 run = false;
               }
@@ -194,7 +180,7 @@
 
       function handleClick() {
         const pos = document.body.scrollHeight - window.scrollY;
-        if(pos < 100 ){
+        if (pos < 100) {
           window.scrollTo(0, document.body.scrollHeight);
         }
         run = true;

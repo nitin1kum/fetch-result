@@ -24,9 +24,9 @@ app.get("/", function (req, res) {
 });
 
 app.get("/result", function (req, res) {
-  const uid = req.query.uid
+  const uid = req.query.uid;
   const url = "https://erpresult.manit.ac.in/?data=Mj"+uid +"wyMDIzfDN8Nnw3NXwyMDIx&RegSession=2023&RegSemester_type_id_code=2&effective_from=2021&semsterNOIdCode=7&programMasterId=75&operation=show-result";
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
   axios.get(url).then((res1)=>{
     const data = {};
     res1.data.split("\n").map((line)=>{
