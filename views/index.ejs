@@ -1,12 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    <h1><%=name%></h1>
-    <img src="/images/Annotation 2022-02-13 212953.png" alt="">
-</body>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        text-align: center;
+        margin: 3rem 0;
+      }
+      table {
+        border-collapse: collapse;
+        margin: auto;
+        width: 80%;
+        height: max-content;
+      }
+      th,
+      td {
+        border: 2px black solid;
+        padding: 6px 1rem;
+      }
+      caption {
+        border: 2px black solid;
+        padding: 6px 1rem;
+      }
+      button {
+        padding: 6px 4px;
+        border: none;
+        outline: none;
+        background-color: green;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>College Result</h1>
+    <table>
+      <caption>
+        You Can Enter Any Digit Of Code
+      </caption>
+      <thead>
+        <tr>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" onkeyup="(handleInput(this,0))" /></td>
+          <td><input type="text" onkeyup="(handleInput(this,1))" /></td>
+          <td><input type="text" onkeyup="(handleInput(this,2))" /></td>
+          <td><input type="text" onkeyup="(handleInput(this,3))" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <br /><br /><br /><br />
+    <table>
+      <caption>
+        <button onclick="handleClick()">Fetch data</button>
+        <button onclick="stop()">Stop</button>
+      </caption>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Scholar No.</th>
+          <th>SGPA</th>
+          <th>CGPA</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <script>
+      const table = document.getElementById("table-body");
+      const alphabet = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"; // All alphabets
+      const capital = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const numbers = "012345"; // Numbers 0-5
+      let clutter = "";
+      let first = "";
+      let sec = "";
+      let third = "";
+      let forth = "";
+      let run = false;
+      let firstAlphabetIndex = 0; // Start with the first alphabet 'A'
+      let secAlphabetIndex = 0; // Start with the first alphabet 'A'
+      let thirdAlphabetIndex = 0; // Start with the first alphabet 'A'
+      let currentNumber = 0; // Start with the number 0
+
+      function fetchData(e) {
+        fetch(`http://127.0.0.1:3000/result?uid=${e}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success && data.data.name && data.data.scholar) {
+              clutter += `
+                <tr>
+                  <td>${data.data.name}</td>
+                  <td>${data.data.scholar}</td>
+                  <td>${data.data.sgpa}</td>
+                  <td>${data.data.cgpa}</td>
+                </tr>
+                `;
+              table.innerHTML = clutter;
+              if (run) {
+                handleClick();
+              }
+            } else {
+              if (run) {
+                handleClick();
+              }
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function handleInput(elem, index) {
+        if (elem.value.length < 2) {
+          switch (index) {
+            case 0:
+              first = elem.value;
+              break;
+            case 1:
+              sec = elem.value;
+              break;
+            case 2:
+              third = elem.value;
+              break;
+            case 3:
+              forth = elem.value;
+              break;
+          }
+        }
+      }
+
+      function generateSequentialId() {
+        // Get current characters based on current indices
+        const firstChar =
+          first !== "" ? first : capital.charAt(firstAlphabetIndex);
+        const secondChar = sec !== "" ? sec : numbers.charAt(currentNumber);
+        const thirdChar =
+          third !== "" ? third : capital.charAt(secAlphabetIndex);
+        const fourthChar =
+          forth !== "" ? forth : alphabet.charAt(thirdAlphabetIndex);
+
+        // Construct the ID
+        const sequentialId = `${firstChar}${secondChar}${thirdChar}${fourthChar}`;
+
+        // Update indices for the next ID
+        if (forth === "") {
+          thirdAlphabetIndex++;
+        }
+        if (forth !== "" || thirdAlphabetIndex >= alphabet.length) {
+          if (third === "") {
+            secAlphabetIndex++;
+          }
+          if (thirdAlphabetIndex >= alphabet.length) {
+            thirdAlphabetIndex = 0;
+          }
+          if (third !== "" || secAlphabetIndex >= capital.length) {
+            if (secAlphabetIndex >= capital.length) {
+              secAlphabetIndex = 0;
+            }
+            if (sec === "") {
+              currentNumber++;
+            }
+            if (sec !== "" || currentNumber >= numbers.length) {
+              if (currentNumber >= numbers.length) {
+                currentNumber = 0;
+              }
+              if (first === "") {
+                firstAlphabetIndex++;
+              }
+              if (firstAlphabetIndex >= capital.length) {
+                run = false;
+              }
+            }
+          }
+        }
+        return sequentialId;
+      }
+
+      function stop() {
+        run = false;
+      }
+
+      function handleClick() {
+        const pos = document.body.scrollHeight - window.scrollY;
+        if(pos < 100 ){
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+        run = true;
+        const customId = generateSequentialId();
+        fetchData(customId);
+      }
+    </script>
+  </body>
 </html>
